@@ -211,7 +211,7 @@ impl From<OrtStatusWrapper> for std::result::Result<(), OrtApiError> {
         if status.0.is_null() {
             Ok(())
         } else {
-            let raw: *const i8 = unsafe {
+            let raw: *const std::ffi::c_char = unsafe {
                 ENV.get()
                     .unwrap()
                     .lock()

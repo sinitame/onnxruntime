@@ -423,17 +423,17 @@ impl Session {
             .map(|output| output.name.clone())
             .map(|n| CString::new(n).unwrap())
             .collect();
-        let output_names_ptr: Vec<*const i8> = output_names_cstring
+        let output_names_ptr: Vec<*const std::ffi::c_char> = output_names_cstring
             .iter()
-            .map(|n| n.as_ptr().cast::<i8>())
+            .map(|n| n.as_ptr().cast::<std::ffi::c_char>())
             .collect();
 
-        let input_names_ptr: Vec<*const i8> = self
+        let input_names_ptr: Vec<*const std::ffi::c_char> = self
             .inputs
             .iter()
             .map(|input| input.name.clone())
             .map(|n| CString::new(n).unwrap())
-            .map(|n| n.into_raw() as *const i8)
+            .map(|n| n.into_raw() as *const std::ffi::c_char)
             .collect();
 
         {
@@ -507,8 +507,8 @@ impl Session {
         let cstrings: Result<Vec<CString>> = input_names_ptr
             .into_iter()
             .map(|p| {
-                assert_not_null_pointer(p, "i8 for CString")?;
-                unsafe { Ok(CString::from_raw(p as *mut i8)) }
+                assert_not_null_pointer(p, "i8 or u8 for CString")?;
+                unsafe { Ok(CString::from_raw(p as *mut std::ffi::c_char)) }
             })
             .collect();
         cstrings?;
@@ -694,14 +694,14 @@ mod dangerous {
             *const sys::OrtSession,
             usize,
             *mut sys::OrtAllocator,
-            *mut *mut i8,
+            *mut *mut std::ffi::c_char,
         ) -> *mut sys::OrtStatus },
         session_ptr: *mut sys::OrtSession,
         allocator_ptr: *mut sys::OrtAllocator,
         i: usize,
         env: _Environment,
     ) -> Result<String> {
-        let mut name_bytes: *mut i8 = std::ptr::null_mut();
+        let mut name_bytes: *mut std::ffi::c_char = std::ptr::null_mut();
 
         let status = unsafe { f(session_ptr, i, allocator_ptr, &mut name_bytes) };
         status_to_result(status).map_err(OrtError::InputName)?;
