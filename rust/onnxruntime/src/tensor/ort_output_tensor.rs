@@ -341,6 +341,7 @@ impl<'a> TryFrom<OrtOutputTensor> for OrtOutput<'a> {
                 sys::ONNXTensorElementDataType::ONNX_TENSOR_ELEMENT_DATA_TYPE_BFLOAT16 => {
                     unimplemented!()
                 }
+                _ => todo!("Not implemented yet")
             }
         }
     }
